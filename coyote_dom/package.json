@@ -1,0 +1,13 @@
+{
+	"name": "coyote_dom",
+	"version": "0.1.0",
+	"description": "",
+	"type": "module",
+	"main": "dist/mod.js",
+	"scripts": {
+		"build": "npx tsc --build",
+		"test": ""
+	},
+	"author": "wolfpup",
+	"license": "BSD-3-Clause"
+}
