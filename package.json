@@ -6,7 +6,9 @@
 		"template_str",
 		"component_string",
 		"html",
-		"coyote_html"
+		"coyote_html",
+		"component_dom",
+		"coyote_dom"
 	],
 	"scripts": {
 		"build": "npm run --workspaces build",

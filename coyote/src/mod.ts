@@ -1,5 +1,5 @@
 class CoyoteComponent {}
-type Component = CoyoteComponent | string | undefined;
+type Component = CoyoteComponent | Node | string | undefined;
 
 class TextComponent extends CoyoteComponent {
 	#text: string;
