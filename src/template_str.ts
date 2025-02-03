@@ -1,15 +1,15 @@
-import type { StepInterface, StepKind } from "../../parse_str/dist/mod.ts";
-import type { RulesetInterface } from "../../rulesets/dist/mod.ts";
+import type { StepInterface, StepKind } from "./parse_str.ts";
+import type { RulesetInterface } from "./rulesets.ts";
 
-import { getTextFromStep, parseStr, route } from "../../parse_str/dist/mod.js";
+import { parseStr, route } from "./parse_str.js";
 
 interface ResultsInterface {
-	strs: string[][];
+	steps: StepInterface[][];
 	injs: StepKind[];
 }
 
 class Results implements ResultsInterface {
-	strs = [];
+	steps = [[]];
 	injs = [];
 }
 
@@ -21,19 +21,16 @@ function compose(
 
 	for (let step of parseStr(ruleset, templateStr, "Initial")) {
 		if ("AttrMapInjection" === step.kind) {
-			pushAttrMapInjection(results);
+			pushInjection(results, step.kind);
 			continue;
 		}
 
 		if ("DescendantInjection" === step.kind) {
-			pushDescendantInjection(results);
+			pushInjection(results, step.kind);
 			continue;
 		}
 
-		if ("InjectionSpace" === step.kind) continue;
-		if ("InjectionConfirmed" === step.kind) continue;
-
-		pushText(results, templateStr, step);
+		pushStep(results, step);
 	}
 
 	return results;
@@ -51,7 +48,7 @@ function composeTemplateArr(
 	for (let [index, templateStr] of templateStrArr.entries()) {
 		for (let step of parseStr(ruleset, templateStr, stepKind)) {
 			stepKind = step.kind;
-			pushText(results, templateStr, step);
+			pushStep(results, step);
 		}
 
 		// if last template str stop
@@ -60,34 +57,24 @@ function composeTemplateArr(
 		let injStepKind = route("{", stepKind);
 
 		if ("AttrMapInjection" === injStepKind) {
-			pushAttrMapInjection(results);
+			pushInjection(results, "AttrMapInjection");
 		}
 
 		if ("DescendantInjection" === injStepKind) {
-			pushDescendantInjection(results);
+			pushInjection(results, "DescendantInjection");
 		}
 	}
 
 	return results;
 }
 
-function pushText(
-	results: ResultsInterface,
-	templateStr: string,
-	step: StepInterface,
-) {
-	const text = getTextFromStep(templateStr, step);
-	results.strs[results.strs.length - 1]?.push(text);
+function pushStep(results: ResultsInterface, step: StepInterface) {
+	results.steps[results.steps.length - 1]?.push(step);
 }
 
-function pushAttrMapInjection(results: ResultsInterface) {
-	results.strs.push([]);
-	results.injs.push("AttrMapInjection");
-}
-
-function pushDescendantInjection(results: ResultsInterface) {
-	results.strs.push([]);
-	results.injs.push("DescendantInjection");
+function pushInjection(results: ResultsInterface, stepKind: StepKind) {
+	results.steps.push([]);
+	results.injs.push(stepKind);
 }
 
 export type { ResultsInterface };

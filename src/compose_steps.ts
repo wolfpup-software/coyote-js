@@ -1,9 +1,9 @@
-import type { StepInterface, StepKind } from "../../parse_str/dist/mod.ts";
-import type { RulesetInterface } from "../../rulesets/dist/mod.ts";
+import type { StepInterface, StepKind } from "./parse_str.ts";
+import type { RulesetInterface } from "./rulesets.ts";
 import type { TagInfoInterface } from "./tag_info.ts";
 
 import { TagInfo, from } from "./tag_info.js";
-import { getTextFromStep, parseStr } from "../../parse_str/dist/mod.js";
+import { getTextFromStep, parseStr } from "./parse_str.js";
 
 type Router = (
 	results: string[],
@@ -266,7 +266,6 @@ function pushInjectionKind(
 	results.push(glpyhs);
 }
 
-// vareful review
 function pushText(
 	results: string[],
 	stack: TagInfo[],
@@ -339,11 +338,11 @@ function pushText(
 	tagInfo.mostRecentDescendant = "Text";
 }
 
+// helpers
 function allSpaces(text: string): boolean {
 	return text.length === getIndexOfFirstChar(text);
 }
 
-// helpers
 function addInlineElementText(results: string[], text: string) {
 	let found = false;
 

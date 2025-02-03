@@ -6,9 +6,9 @@ class TextComponent extends CoyoteComponent {
 	constructor(text: string) {
 		super();
 		this.#text = text
-			.replace("<", "&lt;")
-			.replace("&", "&amp;")
-			.replace("{", "&#123;");
+			.replaceAll("<", "&lt;")
+			.replaceAll("&", "&amp;")
+			.replaceAll("{", "&#123;");
 	}
 
 	get text() {
@@ -35,7 +35,7 @@ class AttrValComponent extends CoyoteComponent {
 	constructor(attr: string, val: string) {
 		super();
 		this.#attr = attr;
-		this.#value = val.replace('"', "&quot;").replace("&", "&amp;");
+		this.#value = val.replaceAll('"', "&quot;").replaceAll("&", "&amp;");
 	}
 
 	get attr() {

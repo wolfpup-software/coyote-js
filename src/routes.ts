@@ -1,4 +1,31 @@
-import type { StepKind } from "./mod.js";
+type StepKind =
+	| "AttrQuoteClosed"
+	| "AttrQuote"
+	| "AttrMapInjection"
+	| "AttrSetter"
+	| "AttrValue"
+	| "AttrValueUnquoted"
+	| "Attr"
+	| "TailElementClosed"
+	| "TailElementSolidus"
+	| "TailElementSpace"
+	| "TailTag"
+	| "DescendantInjection"
+	| "FragmentClosed"
+	| "Fragment"
+	| "EmptyElementClosed"
+	| "EmptyElement"
+	| "Initial"
+	| "InjectionConfirmed"
+	| "InjectionSpace"
+	| "ElementClosed"
+	| "ElementSpace"
+	| "Element"
+	| "Tag"
+	| "Text"
+	| "AltText"
+	| "AltTextCloseSequence"
+	| "CommentText";
 
 type Router = (glyph: string) => StepKind;
 
@@ -139,4 +166,5 @@ function getKindFromInitial(glyph: string): StepKind {
 	return "Text";
 }
 
+export type { StepKind };
 export { route };

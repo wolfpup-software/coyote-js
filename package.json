@@ -1,21 +1,19 @@
 {
-	"workspaces": [
-		"coyote",
-		"rulesets",
-		"parse_str",
-		"template_str",
-		"component_string",
-		"html",
-		"coyote_html"
-	],
+	"name": "coyote",
+	"version": "0.1.0",
+	"description": "html templates",
+	"type": "module",
+	"main": "dist/mod.js",
 	"scripts": {
-		"build": "npm run --workspaces build",
-		"test": "npm run --workspaces test",
-		"format": "npx prettier --write ./"
+		"build": "npx tsc --build",
+		"format": "npx prettier --write ./",
+		"test": "node ../node_modules/jackrabbit/nodejs_cli/bin/mod.js --file ./dist/mod.test.js"
 	},
 	"devDependencies": {
 		"jackrabbit": "github:wolfpup-software/jackrabbit-js",
 		"prettier": "^3.3.3",
 		"typescript": "^5.6.3"
-	}
+	},
+	"author": "wolfpup",
+	"license": "BSD-3-Clause"
 }

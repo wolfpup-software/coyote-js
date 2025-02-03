@@ -1,5 +1,6 @@
 interface RulesetInterface {
 	// parse
+	getInitialNamespace(): string;
 	isComment(tag: string): boolean;
 	getCloseSequenceFromAltTextTag(tag: string): string | undefined;
 	getTagFromCloseSequence(close_sequence: string): string | undefined;
@@ -100,13 +101,16 @@ let voidElements = new Set([
 
 class ServerRules implements RulesetInterface {
 	// parse
+	getInitialNamespace(): string {
+		return "html";
+	}
 	isComment(tag: string): boolean {
 		return isComment(tag);
 	}
-	getCloseSequenceFromAltTextTag(tag: string): string {
+	getCloseSequenceFromAltTextTag(tag: string): string | undefined {
 		return getCloseSequenceFromAltTextTag(tag);
 	}
-	getTagFromCloseSequence(tag: string): string {
+	getTagFromCloseSequence(tag: string): string | undefined {
 		return getTagFromCloseSequence(tag);
 	}
 	// html
@@ -132,6 +136,9 @@ class ServerRules implements RulesetInterface {
 
 class ClientRules implements RulesetInterface {
 	// parse
+	getInitialNamespace(): string {
+		return "html";
+	}
 	isComment(tag: string): boolean {
 		return isComment(tag);
 	}
@@ -170,6 +177,43 @@ class ClientRules implements RulesetInterface {
 	}
 }
 
+class XmlRules implements RulesetInterface {
+	// parse
+	getInitialNamespace(): string {
+		return "xml";
+	}
+	isComment(tag: string): boolean {
+		return isComment(tag);
+	}
+	getCloseSequenceFromAltTextTag(tag: string): string | undefined {
+		if ("!--" === tag) return "-->";
+		if ("![CDATA[" === tag) return "]]>";
+	}
+	getTagFromCloseSequence(tag: string): string | undefined {
+		if ("-->" === tag) return "!--";
+		if ("]]>" === tag) return "![CDATA[";
+	}
+	// html
+	respectIndentation(): boolean {
+		return true;
+	}
+	isBannedEl(tag: string): boolean {
+		return false;
+	}
+	isVoidEl(tag: string): boolean {
+		return false;
+	}
+	isNamespaceEl(tag: string): boolean {
+		return false;
+	}
+	isPreservedTextEl(tag: string): boolean {
+		return false;
+	}
+	isInlineEl(tag: string): boolean {
+		return false;
+	}
+}
+
 function isComment(tag: string): boolean {
 	return "!--" === tag;
 }
@@ -196,4 +240,4 @@ function isPreservedTextEl(tag: string): boolean {
 
 export type { RulesetInterface };
 
-export { ServerRules, ClientRules };
+export { ClientRules, ServerRules, XmlRules };

@@ -1,37 +1,9 @@
-import type { RulesetInterface } from "../../rulesets/dist/mod.ts";
-import type { SlidingWindowInterface } from "./sliding_window.js";
+import type { RulesetInterface } from "./rulesets.ts";
+import type { SlidingWindowInterface } from "./sliding_window.ts";
+import type { StepKind } from "./routes.ts";
 
 import { route } from "./routes.js";
 import { SlidingWindow } from "./sliding_window.js";
-
-type StepKind =
-	| "AttrQuoteClosed"
-	| "AttrQuote"
-	| "AttrMapInjection"
-	| "AttrSetter"
-	| "AttrValue"
-	| "AttrValueUnquoted"
-	| "Attr"
-	| "TailElementClosed"
-	| "TailElementSolidus"
-	| "TailElementSpace"
-	| "TailTag"
-	| "DescendantInjection"
-	| "FragmentClosed"
-	| "Fragment"
-	| "EmptyElementClosed"
-	| "EmptyElement"
-	| "Initial"
-	| "InjectionConfirmed"
-	| "InjectionSpace"
-	| "ElementClosed"
-	| "ElementSpace"
-	| "Element"
-	| "Tag"
-	| "Text"
-	| "AltText"
-	| "AltTextCloseSequence"
-	| "CommentText";
 
 interface StepInterface {
 	kind: StepKind;
@@ -51,7 +23,7 @@ class Step implements StepInterface {
 	}
 }
 
-type Results = Step[];
+type Results = StepInterface[];
 
 function parseStr(
 	sieve: RulesetInterface,

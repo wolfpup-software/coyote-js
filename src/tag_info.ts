@@ -1,4 +1,4 @@
-import type { RulesetInterface } from "../../rulesets/dist/mod.ts";
+import type { RulesetInterface } from "./rulesets.ts";
 
 type DescendantStatus =
 	| "Text"
@@ -29,41 +29,44 @@ class TagInfo implements TagInfoInterface {
 	preservedTextPath: boolean;
 	bannedPath: boolean;
 
-	constructor(sieve: RulesetInterface, tag: string) {
-		this.namespace = sieve.isNamespaceEl(tag) ? tag : "html";
+	constructor(rules: RulesetInterface, tag: string) {
+		this.namespace = rules.isNamespaceEl(tag)
+			? tag
+			: rules.getInitialNamespace();
 		this.tag = tag;
 		this.mostRecentDescendant = "Initial";
 		this.indentCount = 0;
-		this.voidEl = sieve.isVoidEl(tag);
-		this.inlineEl = sieve.isInlineEl(tag);
+		this.voidEl = rules.isVoidEl(tag);
+		this.inlineEl = rules.isInlineEl(tag);
 		// is preserved text element?
 		this.preservedTextPath = false;
-		this.bannedPath = sieve.isBannedEl(tag);
+		this.bannedPath = rules.isBannedEl(tag);
 	}
 }
 
 function from(
-	sieve: RulesetInterface,
+	rules: RulesetInterface,
 	prevTagInfo: TagInfoInterface,
 	tag: string,
 ): TagInfoInterface {
-	let tagInfo = new TagInfo(sieve, tag);
+	let tagInfo = new TagInfo(rules, tag);
 
+	tagInfo.namespace = prevTagInfo.namespace;
 	tagInfo.indentCount = prevTagInfo.indentCount;
 
-	if (sieve.isNamespaceEl(tag)) {
+	if (rules.isNamespaceEl(tag)) {
 		tagInfo.namespace = tag;
 	}
 
-	if (sieve.isPreservedTextEl(prevTagInfo.tag)) {
+	if (rules.isPreservedTextEl(prevTagInfo.tag)) {
 		tagInfo.preservedTextPath = true;
 	}
 
-	if (sieve.isBannedEl(tag)) {
+	if (rules.isBannedEl(tag)) {
 		tagInfo.bannedPath = true;
 	}
 
-	if (!sieve.isVoidEl(prevTagInfo.tag) && !sieve.isInlineEl(tag)) {
+	if (!rules.isVoidEl(prevTagInfo.tag) && !rules.isInlineEl(tag)) {
 		tagInfo.indentCount += 1;
 	}
 
