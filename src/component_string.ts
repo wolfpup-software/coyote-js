@@ -79,13 +79,19 @@ function compose(
 				if (templateStr) {
 					composeSteps(rules, results, tagInfoStack, templateStr, currChunk);
 				}
-
-				// results.push(currChunk);
 			}
 
 			// handle injection
+			// injection is from two kinds of templates
 			let injKind = bit.results.injs[index];
-			let inj = bit.results.injs[index];
+
+			let inj;
+			if (bit.component instanceof TaggedTmplComponent) {
+				inj = bit.component.injections[index];
+			}
+			if (bit.component instanceof TmplComponent) {
+				inj = bit.component.injections[index];
+			}
 
 			if ("AttrMapInjection" === injKind && undefined !== inj) {
 				addAttrInj(results, component);
@@ -105,6 +111,7 @@ function compose(
 		}
 	}
 
+	console.log("compose_string\n", results);
 	return results.join("");
 }
 

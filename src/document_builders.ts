@@ -27,7 +27,7 @@ class Builder implements BuilderInterface {
 class Html {
 	// rules
 	rules = new ServerRules();
-	builder: BuilderInterface;
+	builder = new Builder();
 
 	build(component: Component): string {
 		return buildComponent(this.builder, this.rules, component);
@@ -47,7 +47,7 @@ class ClientHtml {
 class Xml {
 	// rules
 	rules = new XmlRules();
-	builder: BuilderInterface;
+	builder = new Builder();
 
 	build(component: Component): string {
 		return buildComponent(this.builder, this.rules, component);

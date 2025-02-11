@@ -1,3 +1,3 @@
-// import * as composeTests from "./compose.test.js";
+import * as prettyHtmlTests from "./pretty_html.tests.js";
 
-export const testModules = [];
+export const testModules = [prettyHtmlTests];

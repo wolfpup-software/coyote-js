@@ -12,8 +12,8 @@
 	},
 	"devDependencies": {
 		"jackrabbit": "github:wolfpup-software/jackrabbit-js",
-		"prettier": "^3.3.3",
-		"typescript": "^5.6.3"
+		"prettier": "^3.5",
+		"typescript": "^5.7"
 	},
 	"author": "wolfpup",
 	"license": "BSD-3-Clause"
