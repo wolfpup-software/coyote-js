@@ -21,21 +21,21 @@ export { composeString };
 
 interface BuilderInterface {
 	build(rules: RulesetInterface, templateStr: string): TemplateSteps;
-	// buildTemplate(
-	// 	rules: RulesetInterface,
-	// 	templateArray: TemplateStringsArray,
-	// ): TemplateSteps;
+	buildTemplate(
+		rules: RulesetInterface,
+		templateArray: TemplateStringsArray,
+	): TemplateSteps;
 }
 
 class TemplateBit {
-	component: Component;
+	component: TaggedTmplComponent | TmplComponent;
 	results: TemplateSteps;
 	stackDepth: number;
 
 	index = 0;
 
 	constructor(
-		component: Component,
+		component: TaggedTmplComponent | TmplComponent,
 		results: TemplateSteps,
 		stackDepth: number,
 	) {
@@ -71,7 +71,11 @@ function composeString(
 
 		if (Array.isArray(bit)) {
 			// reverse
-			while (bit.length) stack.push(bit.pop());
+			// while (bit.length) {
+			// 	let popped = bit.pop();
+			// 	let nubit = getStackBitFromComponent(tagInfoStack, builder, rules, popped);
+			// 	stack.push(nubit);
+			// }
 		}
 
 		if (bit instanceof TemplateBit) {
@@ -83,21 +87,30 @@ function composeString(
 			let currChunk = bit.results.steps[index];
 			if (currChunk) {
 				let templateStr: string;
-				// if (component instanceof TaggedTmplComponent) {
-				// 	templateStr = component.templateArr[index];
-				// }
+				if (component instanceof TaggedTmplComponent) {
+					templateStr = component.templateArr[index];
+				}
 				if (component instanceof TmplComponent) {
 					templateStr = component.templateStr;
 				}
 				if (templateStr) {
 					composeSteps(rules, results, tagInfoStack, templateStr, currChunk);
 				}
+			} else {
+				if (bit.stackDepth !== tagInfoStack.length) {
+					return [
+						undefined,
+						new Error(`
+Coyote Err: the following template component is imbalanced:
+${currChunk}`),
+					];
+				}
 			}
 
 			// handle injection
 			let injKind = bit.results.injs[index];
 			if ("AttrMapInjection" === injKind) {
-				addAttrInj(tagInfoStack, results, bit.component[index]);
+				addAttrInj(tagInfoStack, results, bit.component.injections[index]);
 			}
 
 			if ("DescendantInjection" === injKind) {
@@ -107,7 +120,7 @@ function composeString(
 					tagInfoStack,
 					builder,
 					rules,
-					bit.component[index],
+					bit.component.injections[index],
 				);
 				stack.push(nuBit);
 
@@ -116,24 +129,6 @@ function composeString(
 
 			// tail case
 			if (index < bit.results.steps.length) {
-				// check for imbalance error
-				let template: string;
-				// if (component instanceof TaggedTmplComponent) {
-				// 	template = component.templateArr.raw.toString();
-				// }
-				if (component instanceof TmplComponent) {
-					template = component.templateStr;
-				}
-				if (bit.stackDepth !== tagInfoStack.length) {
-					return [
-						undefined,
-						new Error(`
-Coyote Err: the following template component is imbalanced:
-${template}
-					`),
-					];
-				}
-
 				stack.push(bit);
 			}
 		}
@@ -148,6 +143,7 @@ function getStackBitFromComponent(
 	rules: RulesetInterface,
 	component: Component,
 ): StackBit {
+	console.log("get stack bit!", component);
 	if (typeof component === "string" || Array.isArray(component))
 		return component;
 
@@ -156,13 +152,14 @@ function getStackBitFromComponent(
 		return new TemplateBit(component, buildResults, stack.length);
 	}
 
-	// if (component instanceof TaggedTmplComponent) {
-	// 	let buildResults = builder.buildTemplate(rules, component.templateArr);
-	// 	return new TemplateBit(component, buildResults, stack.length);
-	// }
+	if (component instanceof TaggedTmplComponent) {
+		let buildResults = builder.buildTemplate(rules, component.templateArr);
+		return new TemplateBit(component, buildResults, stack.length);
+	}
 }
 
 function addAttrInj(stack: TagInfo[], results: string[], component: Component) {
+	console.log("add attribute!", component);
 	if (component instanceof AttrComponent)
 		return pushAttrComponent(results, stack, component.attr);
 	if (component instanceof AttrValComponent) {
@@ -172,11 +169,11 @@ function addAttrInj(stack: TagInfo[], results: string[], component: Component) {
 
 	if (Array.isArray(component)) {
 		for (const cmpnt of component) {
-			if (component instanceof AttrComponent)
-				return pushAttrComponent(results, stack, component.attr);
-			if (component instanceof AttrValComponent) {
-				pushAttrComponent(results, stack, component.attr);
-				return pushAttrValueComponent(results, stack, component.value);
+			if (cmpnt instanceof AttrComponent)
+				pushAttrComponent(results, stack, cmpnt.attr);
+			if (cmpnt instanceof AttrValComponent) {
+				pushAttrComponent(results, stack, cmpnt.attr);
+				pushAttrValueComponent(results, stack, cmpnt.value);
 			}
 		}
 	}

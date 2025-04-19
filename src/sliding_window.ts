@@ -15,10 +15,6 @@ class SlidingWindow implements SlidingWindow {
 	}
 
 	slide(glyph: string): boolean {
-		if (this.#index > this.#target.length) {
-			this.#index = 0;
-		}
-
 		if (this.#target.charAt(this.#index - 1) !== glyph) {
 			this.#index = 0;
 		}

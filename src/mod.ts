@@ -6,5 +6,7 @@
 // Thanks <3
 //
 
+export type { Component } from "./components.ts";
+
 export { attr, attrVal, text, tmpl, tmplStr } from "./components.js";
 export { ClientHtml, Html, Xml } from "./document_builders.js";

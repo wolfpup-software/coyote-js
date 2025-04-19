@@ -226,3 +226,7 @@ export const tests = [
 	document,
 	documentWithAltTextElements,
 ];
+
+export const options = {
+	title: import.meta.url,
+};

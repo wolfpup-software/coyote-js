@@ -118,16 +118,16 @@ function addAltElementText(
 	if (step === undefined) return false;
 
 	let closingSequence = sieve.getCloseSequenceFromAltTextTag(tag);
-	if (closingSequence === undefined) return true;
-
-	step.target = index - (closingSequence.length - 1);
-	steps.push(
-		new Step(
-			"TailTag",
-			index - (closingSequence.length - 1),
-			index - closingSequence.length,
-		),
-	);
+	if (closingSequence) {
+		step.target = index - (closingSequence.length - 1);
+		steps.push(
+			new Step(
+				"TailTag",
+				index - (closingSequence.length - 1),
+				index - closingSequence.length,
+			),
+		);
+	}
 
 	return true;
 }

@@ -2,8 +2,8 @@ import type { BuilderInterface } from "./component_string.js";
 import type { RulesetInterface } from "./rulesets.js";
 import type { Results as StepResults } from "./template_steps.js";
 
-import { compose } from "./template_steps.js";
-// import { compose, composeTemplateArr } from "./template_steps.js";
+// import { compose } from "./template_steps.js";
+import { compose, composeTemplateArr } from "./template_steps.js";
 
 export { Builder };
 
@@ -16,10 +16,10 @@ class Builder implements BuilderInterface {
 		return compose(ruleset, templateStr);
 	}
 
-	// buildTemplate(
-	// 	ruleset: RulesetInterface,
-	// 	templateArray: TemplateStringsArray,
-	// ): StepResults {
-	// 	return composeTemplateArr(ruleset, templateArray);
-	// }
+	buildTemplate(
+		ruleset: RulesetInterface,
+		templateArray: TemplateStringsArray,
+	): StepResults {
+		return composeTemplateArr(ruleset, templateArray);
+	}
 }

@@ -6,7 +6,7 @@ import { parseStr, route } from "./parse_str.js";
 export type { ResultsInterface };
 
 // export { Results, compose, composeTemplateArr };
-export { Results, compose };
+export { Results, compose, composeTemplateArr };
 
 interface ResultsInterface {
 	steps: StepInterface[][];
@@ -18,6 +18,10 @@ class Results implements ResultsInterface {
 	injs = [];
 }
 
+function isInjection(kind: StepKind): boolean {
+	return "AttrMapInjection" === kind || "DescendantInjection" === kind;
+}
+
 function compose(
 	ruleset: RulesetInterface,
 	templateStr: string,
@@ -25,10 +29,7 @@ function compose(
 	let results = new Results();
 
 	for (let step of parseStr(ruleset, templateStr, "Initial")) {
-		if (
-			"AttrMapInjection" === step.kind ||
-			"DescendantInjection" === step.kind
-		) {
+		if (isInjection(step.kind)) {
 			pushInjection(results, step.kind);
 			continue;
 		}
@@ -39,38 +40,44 @@ function compose(
 	return results;
 }
 
-// function composeTemplateArr(
-// 	ruleset: RulesetInterface,
-// 	templateStrArr: TemplateStringsArray,
-// ): ResultsInterface {
-// 	let results = new Results();
+function composeTemplateArr(
+	ruleset: RulesetInterface,
+	templateStrArr: TemplateStringsArray,
+): ResultsInterface {
+	let results = new Results();
 
-// 	let stepKind: StepKind = "Initial";
+	let stepKind: StepKind = "Initial";
 
-// 	// every one except for the last
-// 	for (let [index, templateStr] of templateStrArr.entries()) {
-// 		for (let step of parseStr(ruleset, templateStr, stepKind)) {
-// 			stepKind = step.kind;
-// 			pushStep(results, step);
-// 		}
+	// every one except for the last
+	for (let [index, templateStr] of templateStrArr.entries()) {
+		let steps = parseStr(ruleset, templateStr, stepKind);
 
-// 		// if last template str stop
-// 		if (index > templateStrArr.length - 1) continue;
+		for (let index = 1; index < steps.length; index++) {
+			let step = steps[index];
+			stepKind = step.kind;
+			pushStep(results, step);
+		}
 
-// 		let injStepKind = route("{", stepKind);
+		// if last template str stop
+		if (index > templateStrArr.length - 1) continue;
 
-// 		if (
-// 			"AttrMapInjection" === injStepKind ||
-// 			"DescendantInjection" === injStepKind
-// 		) {
-// 			pushInjection(results, "DescendantInjection");
-// 		} else {
-// 			pushInjection(results, undefined);
-// 		}
-// 	}
+		let injStepKind = route("{", stepKind);
+		if (!isInjection(injStepKind)) {
+			injStepKind = undefined;
+		}
+		pushInjection(results, injStepKind);
 
-// 	return results;
-// }
+		if ("DescendantInjection" === injStepKind) {
+			stepKind = "Initial";
+		}
+
+		if ("AttrMapInjection" === injStepKind) {
+			stepKind = "ElementSpace";
+		}
+	}
+
+	return results;
+}
 
 function pushStep(results: ResultsInterface, step: StepInterface) {
 	results.steps[results.steps.length - 1]?.push(step);
